@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  tag-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create Release Tag
+        id: tag
+        run: |
+          echo "RELEASE_TAG=v$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git tag $RELEASE_TAG
+          git push origin $RELEASE_TAG
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
